@@ -1,0 +1,705 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Movilidad segura</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Nunito:wght@400;600;700&display=swap">
+<style>
+/* Concepto: una ciudad luminosa y soleada. Crema y cielo claro, asfalto perla con líneas amarillo pastel, señales planas. Un color por bloque. Solo tema claro. */
+:root{
+  --crema:#FFFDF5; --cielo:#EAF6FF; --perla:#E6E9EE; --perla-2:#C9CFD8; --lane:#FFE27A;
+  --amarillo:#FFD23F; --menta:#7ED9A6; --coral:#FF8A80; --azul:#6EC1F7; --durazno:#FFB86B;
+  --texto:#1F2A37; --suave:#4A5868; --blanco:#fff; --borde:#E1E6EC;
+  --c:#FFD23F; --ct:#8A6500;
+  --f-titulo:'Barlow Condensed','Arial Narrow',Impact,sans-serif;
+  --f-texto:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{background:var(--crema);color:var(--texto);font-family:var(--f-texto);font-size:17px;line-height:1.6;margin:0;padding-bottom:58px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--crema)}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{font-family:var(--f-titulo);text-transform:uppercase;letter-spacing:.02em;line-height:1.05;margin:0;text-wrap:balance;font-weight:700}
+h2{font-size:clamp(2.2rem,5.2vw,3.5rem)}
+h3{font-size:clamp(1.6rem,3.6vw,2.3rem)}
+p{margin:0}
+a{color:#1B6FA8}
+:focus-visible{outline:3px solid #1B6FA8;outline-offset:3px;border-radius:4px}
+button{font:inherit;color:inherit;cursor:pointer}
+.etiqueta{font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--suave)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* nubes de fondo */
+.nubes{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.nube{position:absolute;left:0;animation:nube linear infinite;opacity:.9}
+@keyframes nube{from{transform:translateX(-300px)}to{transform:translateX(100vw)}}
+main,.cierre{position:relative;z-index:1}
+
+/* barra superior */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(255,253,245,.96);border-bottom:2px solid var(--perla)}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:4px;background:repeating-linear-gradient(90deg,var(--amarillo) 0 22px,transparent 22px 40px)}
+.top .wrap{display:flex;align-items:center;gap:14px;min-height:56px}
+.semaforo{display:flex;flex-direction:column;gap:3px;background:#5B6B7C;padding:4px 5px;border-radius:7px;flex:none}
+.semaforo i{width:10px;height:10px;border-radius:50%;background:#8997A7;display:block;transition:background .3s,box-shadow .3s}
+.semaforo[data-luz="r"] i:nth-child(1){background:var(--coral);box-shadow:0 0 8px var(--coral)}
+.semaforo[data-luz="a"] i:nth-child(2){background:var(--amarillo);box-shadow:0 0 8px var(--amarillo)}
+.semaforo[data-luz="v"] i:nth-child(3){background:var(--menta);box-shadow:0 0 8px var(--menta)}
+.marca{font-family:var(--f-titulo);font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:1.25rem;white-space:nowrap}
+.menu{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+.menu::-webkit-scrollbar{display:none}
+.menu a{color:var(--suave);text-decoration:none;font-size:.95rem;font-weight:600;padding:8px 11px;border-radius:8px;white-space:nowrap}
+.menu a:hover{background:var(--perla);color:var(--texto)}
+.menu a[aria-current="true"]{color:var(--texto);background:var(--amarillo)}
+.contador{font-family:var(--f-titulo);font-weight:700;font-size:1.2rem;background:var(--cielo);border:2px solid var(--azul);padding:1px 10px;border-radius:8px;white-space:nowrap;flex:none}
+
+/* carretera inferior */
+.carretera{position:fixed;left:0;right:0;bottom:0;z-index:40;height:calc(36px + env(safe-area-inset-bottom,0px));background:var(--perla);border-top:3px solid var(--perla-2);pointer-events:none}
+.carretera::before{content:"";position:absolute;left:0;right:0;top:calc(50% - 1px - env(safe-area-inset-bottom,0px)/2);height:4px;background:repeating-linear-gradient(90deg,var(--amarillo) 0 18px,transparent 18px 34px)}
+.carretera svg{position:absolute;top:1px;width:46px;height:23px;left:0;will-change:transform}
+
+/* portada */
+.hero{padding-block:44px 0;overflow:hidden;background:linear-gradient(180deg,var(--cielo) 0%,var(--crema) 100%)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:28px;align-items:center}
+.hero h1{font-size:clamp(2.4rem,4.6vw,4.2rem);animation:bajar .8s cubic-bezier(.2,.9,.3,1.1) both}
+.hero h1 em{font-style:normal;display:inline-block;background:var(--amarillo);padding:0 .18em;border-radius:.12em;transform:rotate(-1.5deg)}
+.hero .sub{margin-top:18px;color:var(--suave);font-size:1.2rem;max-width:36ch}
+.cifras{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.cifra{display:flex;align-items:baseline;gap:7px;border:3px solid var(--texto);border-radius:12px;padding:4px 14px;background:#fff}
+.cifra b{font-family:var(--f-titulo);font-size:2rem;line-height:1}
+.cifra span{font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.boton{display:inline-flex;align-items:center;gap:10px;margin-top:26px;background:var(--amarillo);color:var(--texto);border:3px solid var(--texto);border-radius:12px;padding:11px 24px;font-family:var(--f-titulo);font-weight:700;font-size:1.4rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;box-shadow:0 5px 0 var(--texto);transition:transform .15s,box-shadow .15s}
+.boton:hover{transform:translateY(2px);box-shadow:0 3px 0 var(--texto)}
+.boton span[aria-hidden]{display:inline-block;animation:flecha 1.2s ease-in-out infinite}
+.boton.sec2{background:#fff}
+.escena{width:100%;height:auto;display:block}
+.escena .dash{animation:dash 1.6s linear infinite}
+.escena .auto-h{animation:pasar 13s linear infinite}
+.escena .bus-h{animation:bus 22s linear infinite}
+.escena .bici-h{animation:bici 17s linear infinite}
+.escena .peaton-g{animation:camina 30s linear infinite}
+.escena .nube-e{animation:nube-e 40s linear infinite}
+.escena .nube-e.n2{animation-duration:55s;animation-delay:-20s}
+.escena .sol{animation:sol 5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.escena .l-r{animation:lr 9s steps(1) infinite}.escena .l-a{animation:la 9s steps(1) infinite}.escena .l-v{animation:lv 9s steps(1) infinite}
+.escena .pierna{transform-box:fill-box;transform-origin:50% 0;animation:paso .7s ease-in-out infinite alternate}
+.escena .p2{animation-direction:alternate-reverse}
+.rueda{transform-box:fill-box;transform-origin:center;animation:giro 1s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-52}}
+@keyframes pasar{from{transform:translate(-150px,352px)}to{transform:translate(720px,352px)}}
+@keyframes bus{from{transform:translate(720px,306px)}to{transform:translate(-220px,306px)}}
+@keyframes bici{from{transform:translate(-100px,316px)}to{transform:translate(720px,316px)}}
+@keyframes camina{from{transform:translate(-20px,283px)}to{transform:translate(660px,283px)}}
+@keyframes nube-e{from{transform:translateX(-200px)}to{transform:translateX(760px)}}
+@keyframes sol{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes lr{0%{opacity:1}45%,100%{opacity:.25}}@keyframes la{0%,84%{opacity:.25}85%{opacity:1}100%{opacity:.25}}@keyframes lv{0%,44%{opacity:.25}45%{opacity:1}84%,100%{opacity:.25}}
+@keyframes paso{from{transform:rotate(-26deg)}to{transform:rotate(26deg)}}
+@keyframes giro{to{transform:rotate(360deg)}}
+@keyframes bajar{from{transform:translateY(-30px);opacity:0}to{transform:none;opacity:1}}
+@keyframes flecha{50%{transform:translateX(6px)}}
+.escena .auto-h{transform:translate(120px,352px)}
+
+/* secciones */
+section.sec{padding-block:80px 8px}
+.cab{display:flex;flex-direction:column;gap:10px;margin-bottom:30px}
+.cab h2::after{content:"";display:block;height:7px;margin-top:12px;width:0;background:repeating-linear-gradient(90deg,var(--amarillo) 0 18px,transparent 18px 30px);transition:width .9s ease-out}
+.cab.in h2::after{width:200px}
+.objetivo-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:stretch}
+.letrero{background:var(--azul);color:var(--texto);border-radius:18px;padding:22px 24px;border:4px solid #fff;outline:4px solid var(--azul);outline-offset:-10px;box-shadow:0 6px 0 rgba(31,42,55,.12)}
+.letrero p{font-size:1.25rem;line-height:1.55;padding:8px;font-weight:600}
+.producto{background:#fff;border:3px dashed var(--durazno);border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.producto h3{font-size:1.8rem}
+.producto p{color:var(--suave)}
+
+/* mapa */
+.resumen{color:var(--suave);margin-bottom:22px;font-size:1.05rem}
+.ruta{display:grid;grid-template-columns:170px 1fr;gap:18px;align-items:start;padding:18px 0;border-top:2px solid var(--perla)}
+.ruta-n{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.ruta-n b{font-family:var(--f-titulo);font-size:1.25rem;line-height:1.1;text-transform:uppercase;color:var(--ct)}
+.paradas{display:grid;grid-template-columns:repeat(5,1fr);position:relative}
+.paradas::before{content:"";position:absolute;left:10%;right:10%;top:18px;height:18px;background:var(--perla);border-radius:9px;border:2px solid var(--perla-2)}
+.paradas::after{content:"";position:absolute;left:10%;right:10%;top:26px;height:3px;background:repeating-linear-gradient(90deg,var(--amarillo) 0 12px,transparent 12px 22px)}
+.parada{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;background:none;border:0;padding:0 4px;text-align:center}
+.parada .num{width:44px;height:44px;border-radius:50%;background:var(--c);color:var(--texto);display:grid;place-items:center;font-family:var(--f-titulo);font-weight:700;font-size:1.4rem;border:3px solid #fff;box-shadow:0 0 0 3px var(--texto);transition:transform .15s;position:relative}
+.parada:hover .num{transform:scale(1.12)}
+.parada .tt{font-size:.85rem;line-height:1.25;color:var(--suave);max-width:16ch;font-weight:600}
+.parada.vista .num::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.7 2.7L12 5.5' fill='none' stroke='%231F7A4D' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");border:2px solid #1F7A4D;top:-8px;right:-8px}
+.mini-auto{position:absolute;top:10px;left:10%;width:36px;height:18px;z-index:0;animation:viaje 9s linear infinite}
+.ruta[data-b="2"] .mini-auto{animation-duration:7s;animation-delay:-2s}.ruta[data-b="3"] .mini-auto{animation-duration:10s;animation-delay:-4s}.ruta[data-b="4"] .mini-auto{animation-duration:8s;animation-delay:-1s}
+@keyframes viaje{from{left:6%}to{left:92%}}
+
+/* señal de bloque */
+.senal{width:48px;height:48px;display:grid;place-items:center;background:var(--c);color:var(--texto);flex:none;border:3px solid var(--texto)}
+.senal svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+[data-b="1"] .senal{transform:rotate(45deg);border-radius:9px;width:40px;height:40px;margin:5px}
+[data-b="1"] .senal svg{transform:rotate(-45deg);width:22px;height:22px}
+[data-b="2"] .senal{border-radius:10px}
+[data-b="3"] .senal{border-radius:50%}
+[data-b="4"] .senal{border-radius:8px 8px 24px 24px}
+[data-b="2"] .senal svg{animation:rebota 1.8s ease-in-out infinite}
+[data-b="3"] .senal svg{animation:balanceo 2.6s ease-in-out infinite;transform-origin:50% 20%}
+[data-b="4"] .senal svg{animation:ondea 2s ease-in-out infinite;transform-origin:20% 50%}
+[data-b="1"] .senal{animation:guino 3.6s ease-in-out infinite}
+.fbtn .senal,.ruta .senal{animation:none}
+@keyframes rebota{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes balanceo{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}
+@keyframes ondea{0%,100%{transform:skewY(0)}50%{transform:skewY(-7deg)}}
+@keyframes guino{0%,88%,100%{transform:rotate(45deg) scale(1)}94%{transform:rotate(45deg) scale(1.12)}}
+.bloque[data-b="1"],.sheet[data-b="1"],.f-1,.ruta[data-b="1"],#tabla tr[data-b="1"]{--c:#FFD23F;--ct:#8A6500}
+.bloque[data-b="2"],.sheet[data-b="2"],.f-2,.ruta[data-b="2"],#tabla tr[data-b="2"]{--c:#6EC1F7;--ct:#1B6FA8}
+.bloque[data-b="3"],.sheet[data-b="3"],.f-3,.ruta[data-b="3"],#tabla tr[data-b="3"]{--c:#FF8A80;--ct:#B23A32}
+.bloque[data-b="4"],.sheet[data-b="4"],.f-4,.ruta[data-b="4"],#tabla tr[data-b="4"]{--c:#7ED9A6;--ct:#1F7A4D}
+
+/* filtros */
+.filtros{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.filtros .grupo{display:flex;flex-wrap:wrap;gap:8px}
+.fbtn{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--perla-2);border-radius:999px;padding:5px 16px 5px 6px;font-weight:700;font-size:.95rem}
+.fbtn .senal{width:30px;height:30px;margin:0!important;border-radius:50%!important;transform:none!important;border-width:2px}
+.fbtn .senal svg{width:16px;height:16px;transform:none!important;animation:none!important}
+.fbtn.todos{padding-left:16px}
+.fbtn:hover{border-color:var(--texto)}
+.fbtn[aria-pressed="true"]{border-color:var(--texto);background:var(--c,var(--amarillo));box-shadow:0 3px 0 var(--texto)}
+.fbtn.todos[aria-pressed="true"]{background:var(--amarillo)}
+.buscar{flex:1;min-width:220px}
+.buscar input{width:100%;background:#fff;border:2px solid var(--perla-2);border-radius:12px;padding:10px 14px;font:inherit;color:var(--texto)}
+.buscar input::placeholder{color:#66758A}
+.estado{color:var(--suave);font-size:.95rem;min-height:1.5em;margin-bottom:6px}
+.reiniciar{background:none;border:2px solid var(--perla-2);border-radius:10px;padding:6px 12px;font-size:.9rem;color:var(--suave);font-weight:600}
+.reiniciar.aviso{border-color:#B23A32;color:#B23A32}
+
+/* bloques y tarjetas */
+.bloque{margin-top:36px;padding-top:30px;border-top:8px solid var(--c);position:relative}
+.bloque.in .b-cab .senal:not(.fbtn .senal){animation-name:aparece-s,none}
+.b-cab{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;margin-bottom:20px}
+.b-cab .etiqueta b{color:var(--ct)}
+.b-cab h3{margin-top:4px}
+.progreso{min-width:130px;text-align:right}
+.progreso .barra{height:10px;background:#fff;border-radius:5px;overflow:hidden;margin-top:6px;border:2px solid var(--perla-2)}
+.progreso .barra i{display:block;height:100%;background:var(--c);width:0;transition:width .4s}
+.progreso b{font-family:var(--f-titulo);font-size:1.6rem}
+.progreso small{display:block;font-size:.8rem;color:var(--suave);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.b-info{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.b-info>div{background:#fff;border-radius:16px;padding:16px 20px;border:2px solid var(--borde)}
+.b-info .etiqueta{display:block;margin-bottom:4px;color:var(--ct)}
+.tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px}
+.card{position:relative;background:#fff;border:2px solid var(--borde);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0;transition:border-color .15s,transform .15s,box-shadow .15s;box-shadow:0 3px 0 var(--perla)}
+.card:hover{border-color:var(--c);transform:translateY(-3px);box-shadow:0 6px 0 var(--c)}
+.card.in{animation:pop .5s ease-out}
+@keyframes pop{from{transform:translateY(12px);opacity:.4}to{transform:none;opacity:1}}
+@keyframes aparece-s{from{transform:scale(.5) rotate(-20deg);opacity:.3}to{opacity:1}}
+.card-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.nro{width:44px;height:44px;border-radius:50%;background:var(--c);color:var(--texto);display:grid;place-items:center;font-family:var(--f-titulo);font-weight:700;font-size:1.45rem;border:3px solid var(--texto)}
+.card:hover .nro{animation:meneo .55s ease-in-out}
+@keyframes meneo{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg) scale(1.08)}60%{transform:rotate(12deg) scale(1.08)}}
+.card h4{font-size:1.4rem;text-transform:none;letter-spacing:0;line-height:1.1}
+.card h4 button{background:none;border:0;padding:0;text-align:left;font:inherit;text-transform:inherit;text-wrap:balance}
+.card h4 button::after{content:"";position:absolute;inset:0;border-radius:16px}
+.card p{font-size:.95rem;color:var(--suave);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.est-chip{margin-top:auto;display:inline-block;align-self:flex-start;max-width:100%;background:var(--azul);color:var(--texto);border:2px solid #fff;outline:2px solid var(--azul);border-radius:8px;padding:3px 10px;font-size:.85rem;font-weight:700;line-height:1.3}
+.chk{position:relative;z-index:2;display:flex;align-items:center;gap:7px;font-size:.88rem;font-weight:700;color:var(--suave);cursor:pointer;background:var(--crema);border:2px solid var(--perla);padding:3px 10px 3px 5px;border-radius:999px}
+.chk input{appearance:none;width:20px;height:20px;border:2px solid var(--suave);border-radius:6px;display:grid;place-items:center;margin:0;cursor:pointer;background:#fff}
+.chk input:checked{background:var(--menta);border-color:#1F7A4D}
+.chk input:checked::after{content:"";width:5px;height:10px;border:solid var(--texto);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.vacio{padding:40px;text-align:center;border:3px dashed var(--perla-2);border-radius:18px;color:var(--suave)}
+
+/* evaluación */
+.eval-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.eval-grid article{background:#fff;border:2px solid var(--borde);border-radius:18px;padding:20px;border-top:8px solid var(--c);transition:transform .25s}
+.eval-grid article:hover{transform:translateY(-4px)}
+.eval-grid h4{font-size:1.5rem;margin-bottom:8px;color:var(--ct)}
+.eval-grid p{color:var(--suave);font-size:1rem}
+.sinlista{margin-top:22px}
+.sinlista .etiqueta{display:block;margin-bottom:8px}
+.sinlista div{display:flex;flex-wrap:wrap;gap:8px}
+.sinlista span{border:2px solid var(--texto);border-radius:999px;padding:3px 14px;font-weight:700;background:#fff;font-size:.95rem}
+.sinlista span::before{content:"✕ ";color:#B23A32}
+.nota{margin-top:22px;display:flex;gap:14px;align-items:flex-start;background:var(--azul);color:var(--texto);border:4px solid #fff;outline:4px solid var(--azul);outline-offset:-10px;border-radius:14px;padding:16px 20px}
+.nota svg{flex:none;width:30px;height:30px;margin-top:2px}
+
+/* tabla */
+.tabla-w{overflow-x:auto;border:2px solid var(--borde);border-radius:16px;background:#fff}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--borde);vertical-align:top;font-size:.98rem}
+thead th{background:var(--cielo);font-family:var(--f-titulo);text-transform:uppercase;letter-spacing:.05em;font-size:1.1rem;position:sticky;top:0}
+td.act button{background:none;border:0;padding:0;text-align:left;font-weight:700;text-decoration:underline;text-decoration-color:var(--c);text-decoration-thickness:3px;text-underline-offset:3px}
+td.bl{white-space:nowrap}
+td.bl .dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--c);border:2px solid var(--texto);margin-right:8px}
+tbody tr:hover{background:var(--crema)}
+.resumen-t{margin-top:18px}
+.mini{width:100%;min-width:560px}
+.mini th,.mini td{font-size:.95rem}
+.mini tfoot th,.mini tfoot td{background:var(--amarillo);font-weight:800;border:0}
+
+/* cierre */
+.cierre{margin-top:84px;background:linear-gradient(180deg,#D5F0E0,#EAF8F0);border-top:8px solid var(--menta);padding-block:64px 80px;text-align:center;overflow:hidden}
+.cierre .wrap{display:flex;flex-direction:column;align-items:center;gap:16px;position:relative}
+.cierre h2 em{font-style:normal;color:#1F7A4D}
+.cierre p{color:var(--texto);max-width:54ch;font-size:1.1rem}
+.btns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.conos{position:absolute;left:max(16px,4vw);bottom:14px;display:flex;gap:14px;align-items:flex-end}
+.cono{animation:salto 1.6s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes salto{0%,45%,100%{transform:translateY(0)}20%{transform:translateY(-14px) rotate(-3deg)}32%{transform:translateY(0) scaleY(.94)}}
+.bandera{animation:ondear 1.8s ease-in-out infinite;transform-origin:20% 90%}
+@keyframes ondear{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(4deg) skewY(-5deg)}}
+
+/* detalle */
+.modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.scrim{position:absolute;inset:0;background:rgba(31,42,55,.5);animation:aparece .25s ease-out}
+.sheet{position:relative;width:min(780px,100%);max-height:100%;overflow:hidden;display:flex;flex-direction:column;background:var(--crema);border:3px solid var(--texto);border-top:12px solid var(--c);border-radius:20px;box-shadow:0 12px 0 rgba(31,42,55,.18);animation:sube .3s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes sube{from{transform:translateY(40px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+@keyframes aparece{from{opacity:0}to{opacity:1}}
+.sheet-cab{display:flex;gap:14px;align-items:flex-start;padding:18px 22px 12px}
+.sheet-cab .t{flex:1;min-width:0}
+.sheet-cab h2{font-size:clamp(1.8rem,4.6vw,2.6rem);margin-top:4px;text-transform:none;letter-spacing:0}
+.cerrar{background:#fff;border:2px solid var(--texto);border-radius:10px;width:44px;height:44px;font-size:1.3rem;line-height:1;flex:none;font-weight:700}
+.sheet-cuerpo{overflow-y:auto;padding:4px 22px 22px;display:flex;flex-direction:column;gap:20px}
+.sheet-cuerpo h3{font-size:.9rem;font-family:var(--f-texto);font-weight:800;letter-spacing:.12em;color:var(--ct);margin-bottom:6px}
+.tiempo{display:flex;gap:4px}
+.seg{flex:1 1 0;min-width:76px;border:2px solid var(--perla-2);border-radius:10px;padding:8px 10px;text-align:left;background:#fff;border-bottom:6px solid var(--perla-2);font-size:.9rem;line-height:1.25;font-weight:600}
+.seg b{display:block;font-family:var(--f-titulo);font-size:1.25rem;text-transform:uppercase;letter-spacing:.04em}
+.seg[aria-selected="true"]{border-color:var(--texto);border-bottom-color:var(--c);background:#fff;box-shadow:0 0 0 2px var(--c)}
+.seg[data-k="inicio"]{flex-grow:10}.seg[data-k="desarrollo"]{flex-grow:35}.seg[data-k="cierre"]{flex-grow:15}
+.panel{background:#fff;border-radius:12px;padding:14px 18px;margin-top:8px;border:2px solid var(--borde)}
+.panel p{animation:aparece .3s ease-out}
+.dur{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-weight:700}
+.dur svg{width:22px;height:22px;stroke:var(--texto);fill:none;stroke-width:2;stroke-linecap:round}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{background:#fff;border:2px solid var(--borde);border-radius:8px;padding:3px 10px;font-size:.95rem}
+.estrategia{background:var(--azul);color:var(--texto);border:4px solid #fff;outline:4px solid var(--azul);outline-offset:-11px;border-radius:18px;padding:22px 24px;box-shadow:0 5px 0 rgba(31,42,55,.15)}
+.estrategia .etiqueta{color:var(--texto);display:flex;align-items:center;gap:8px}
+.estrategia .etiqueta svg{width:22px;height:22px}
+.estrategia h3{color:var(--texto)!important;font-family:var(--f-titulo)!important;font-size:1.9rem!important;letter-spacing:.02em!important;text-transform:none;margin:4px 0 8px!important}
+.estrategia p{font-size:1.02rem;font-weight:600}
+.tipo{display:inline-block;margin-top:12px;background:#fff;border:2px solid var(--texto);border-radius:999px;padding:3px 14px;font-weight:800;font-size:.92rem}
+.sheet-pie{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 22px;border-top:2px solid var(--perla);background:#fff}
+.nav-b{background:var(--amarillo);border:2px solid var(--texto);border-radius:10px;padding:8px 16px;font-weight:800;box-shadow:0 3px 0 var(--texto)}
+.nav-b:disabled{opacity:.4;cursor:default;box-shadow:none}
+.pos{color:var(--suave);font-size:.95rem;text-align:center;font-weight:700}
+.confeti{position:fixed;z-index:200;pointer-events:none;width:9px;height:14px;border-radius:3px;left:0;top:0}
+.aviso-t{position:fixed;left:50%;top:calc(76px + env(safe-area-inset-top,0px));z-index:210;transform:translateX(-50%);background:var(--amarillo);color:var(--texto);border:3px solid var(--texto);border-radius:14px;padding:8px 20px;font-family:var(--f-titulo);font-weight:700;font-size:1.4rem;text-transform:uppercase;letter-spacing:.04em;text-align:center;max-width:calc(100vw - 32px);animation:toast 3s ease-in-out both;pointer-events:none;box-shadow:0 4px 0 var(--texto)}
+@keyframes toast{0%{transform:translate(-50%,-30px) scale(.8);opacity:0}10%{transform:translate(-50%,0) scale(1.06);opacity:1}16%,85%{transform:translate(-50%,0) scale(1);opacity:1}100%{transform:translate(-50%,-20px);opacity:0}}
+#imprimible{display:none}
+
+@media (max-width:860px){
+  .hero .wrap,.objetivo-grid{grid-template-columns:1fr}
+  .ruta{grid-template-columns:1fr;gap:10px}
+  .ruta-n{flex-direction:row;align-items:center}
+  .b-cab{grid-template-columns:auto 1fr}
+  .progreso{grid-column:1/-1;text-align:left}
+  .b-info{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  body{font-size:16px}
+  .marca{display:none}
+  .parada .tt{display:none}
+  .parada .num{width:38px;height:38px;font-size:1.2rem}
+  .paradas::before{top:15px}.paradas::after{top:23px}.mini-auto{top:7px}
+  .sheet-cab{padding:14px 14px 8px}.sheet-cuerpo{padding:4px 14px 16px}.sheet-pie{padding:10px 14px}
+  section.sec{padding-top:60px}
+  .conos{display:none}
+  .seg{padding:8px 6px;font-size:.82rem}.seg b{font-size:1.02rem;letter-spacing:0}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .escena .auto-h{transform:translate(120px,352px)}
+  .escena .peaton-g{transform:translate(300px,283px)}
+  .escena .bus-h{transform:translate(380px,306px)}
+  .escena .bici-h{transform:translate(200px,316px)}
+}
+@media print{
+  :root{color-scheme:light}
+  body{background:#fff;color:#000;padding:0;font-size:11pt}
+  body::before,.top,.carretera,.nubes,.hero,section.sec,.cierre,.modal,.confeti,.aviso-t{display:none!important}
+  #imprimible{display:block}
+  #imprimible h1{font-size:24pt;margin-bottom:6pt}
+  #imprimible h2{font-size:15pt;margin:14pt 0 4pt;break-after:avoid}
+  #imprimible .act{break-inside:avoid;border-top:2pt solid #000;padding:6pt 0 8pt}
+  #imprimible p{margin:2pt 0}
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-ojo" viewBox="0 0 24 24"><path d="M1.5 12S5.5 5 12 5s10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3.2"/></symbol>
+    <symbol id="i-ruta" viewBox="0 0 24 24"><path d="M12 22v-9M12 13 5 6M12 13l7-7M5 11V6h5M14 6h5v5"/></symbol>
+    <symbol id="i-balanza" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M4 7h16M4 7l-3 8a4 3 0 0 0 6 0zM20 7l-3 8a4 3 0 0 0 6 0z"/></symbol>
+    <symbol id="i-bandera" viewBox="0 0 24 24"><path d="M5 22V3M5 4h14l-3.5 4.5L19 13H5"/></symbol>
+    <symbol id="i-reloj" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7v.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="auto" viewBox="0 0 110 54">
+      <path d="M2 36c0-8 4-14 12-14h4L36 4h38l20 18h8c6 0 10 6 10 14v8H2z" fill="#FFD23F" stroke="#1F2A37" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M31 22 41 8h14v14zM60 22V8h14l16 14z" fill="#EAF6FF" stroke="#1F2A37" stroke-width="2"/>
+      <circle cx="28" cy="46" r="9" fill="#1F2A37" stroke="#fff" stroke-width="3"/><circle cx="86" cy="46" r="9" fill="#1F2A37" stroke="#fff" stroke-width="3"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="nubes" aria-hidden="true">
+  <svg class="nube" width="220" height="90" viewBox="0 0 220 90" style="top:9vh;animation-duration:70s;animation-delay:-20s"><path d="M30 80a24 24 0 0 1 2-48 34 34 0 0 1 64-8 30 30 0 0 1 52 14 26 26 0 0 1 40 42z" fill="#DCEFFC"/></svg>
+  <svg class="nube" width="170" height="70" viewBox="0 0 220 90" style="top:30vh;animation-duration:90s;animation-delay:-60s"><path d="M30 80a24 24 0 0 1 2-48 34 34 0 0 1 64-8 30 30 0 0 1 52 14 26 26 0 0 1 40 42z" fill="#E6F4FD"/></svg>
+  <svg class="nube" width="260" height="105" viewBox="0 0 220 90" style="top:56vh;animation-duration:110s;animation-delay:-35s"><path d="M30 80a24 24 0 0 1 2-48 34 34 0 0 1 64-8 30 30 0 0 1 52 14 26 26 0 0 1 40 42z" fill="#DCEFFC"/></svg>
+  <svg class="nube" width="190" height="78" viewBox="0 0 220 90" style="top:78vh;animation-duration:80s;animation-delay:-5s"><path d="M30 80a24 24 0 0 1 2-48 34 34 0 0 1 64-8 30 30 0 0 1 52 14 26 26 0 0 1 40 42z" fill="#E6F4FD"/></svg>
+</div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="semaforo" id="semaforo" data-luz="r" role="img" aria-label="Semáforo de avance del recorrido"><i></i><i></i><i></i></div>
+    <span class="marca">Movilidad segura</span>
+    <nav class="menu" id="menu" aria-label="Secciones">
+      <a href="#inicio" data-s="inicio">Inicio</a>
+      <a href="#objetivo" data-s="objetivo">Objetivo</a>
+      <a href="#recorrido" data-s="recorrido">Recorrido</a>
+      <a href="#bloques" data-s="bloques">Bloques</a>
+      <a href="#evaluacion" data-s="evaluacion">Evaluación</a>
+      <a href="#sintesis" data-s="sintesis">Estrategias</a>
+      <a href="#cierre" data-s="cierre">Cierre</a>
+    </nav>
+    <div class="contador" aria-live="polite"><b id="cont-n">0</b>/20 <span style="font-size:.8em">vistas</span></div>
+  </div>
+</header>
+
+<div class="carretera" aria-hidden="true"><svg id="auto-scroll" viewBox="0 0 110 54"><use href="#auto"/></svg></div>
+
+<main>
+<section class="hero" id="inicio">
+  <div class="wrap">
+    <div>
+      <p class="etiqueta">Propuesta educativa · Nueva Escuela Mexicana</p>
+      <h1 style="margin-top:10px">Movilidad <em>segura</em> para estudiantes universitarios</h1>
+      <p class="sub">20 actividades · 4 bloques · 20 horas. Un recorrido para mirar la calle de otra manera y decidir mejor cómo nos movemos.</p>
+      <div class="cifras" role="list">
+        <div class="cifra" role="listitem"><b>20</b><span>actividades</span></div>
+        <div class="cifra" role="listitem"><b>4</b><span>bloques</span></div>
+        <div class="cifra" role="listitem"><b>20</b><span>horas</span></div>
+      </div>
+      <a class="boton" href="#objetivo" data-ir="objetivo">Iniciar recorrido <span aria-hidden="true">→</span></a>
+    </div>
+    <svg class="escena" viewBox="0 0 640 410" role="img" aria-label="Escena de una calle soleada con semáforo, señales de alto, ceda el paso, escuela, velocidad máxima y prohibido estacionar, un autobús, un auto, una bicicleta y un peatón">
+      <circle class="sol" cx="70" cy="62" r="34" fill="#FFE27A"/>
+      <g fill="#fff" stroke="#CFE8FA" stroke-width="2"><g class="nube-e"><path d="M40 70a16 16 0 0 1 1-32 22 22 0 0 1 42-5 20 20 0 0 1 34 9 17 17 0 0 1 26 28z" transform="translate(150 20)"/></g><g class="nube-e n2"><path d="M40 70a16 16 0 0 1 1-32 22 22 0 0 1 42-5 20 20 0 0 1 34 9 17 17 0 0 1 26 28z" transform="translate(380 70) scale(.8)"/></g></g>
+      <g><rect x="8" y="150" width="70" height="140" fill="#FFE3C2"/><rect x="88" y="110" width="62" height="180" fill="#CFE8FA"/><rect x="160" y="172" width="80" height="118" fill="#FFD6D2"/><rect x="250" y="92" width="64" height="198" fill="#D5F0E0"/><rect x="324" y="140" width="76" height="150" fill="#FFE3C2"/><rect x="410" y="120" width="62" height="170" fill="#CFE8FA"/><rect x="482" y="178" width="52" height="112" fill="#FFD6D2"/></g>
+      <g fill="#FFFDF5"><rect x="22" y="170" width="10" height="13"/><rect x="48" y="200" width="10" height="13"/><rect x="104" y="140" width="10" height="13"/><rect x="128" y="190" width="10" height="13"/><rect x="266" y="120" width="10" height="13"/><rect x="290" y="170" width="10" height="13"/><rect x="340" y="170" width="10" height="13"/><rect x="424" y="150" width="10" height="13"/><rect x="176" y="204" width="10" height="13"/><rect x="62" y="236" width="10" height="13"/><rect x="118" y="236" width="10" height="13"/><rect x="266" y="204" width="10" height="13"/><rect x="364" y="204" width="10" height="13"/><rect x="440" y="196" width="10" height="13"/></g>
+      <g><rect x="540" y="236" width="6" height="52" fill="#B8926A"/><circle cx="543" cy="224" r="30" fill="#7ED9A6"/><rect x="2" y="250" width="5" height="38" fill="#B8926A"/></g>
+      <rect x="0" y="288" width="640" height="14" fill="#F3EFE4"/><rect x="0" y="300" width="640" height="3" fill="#C9CFD8"/>
+      <rect x="0" y="302" width="640" height="108" fill="#E6E9EE"/>
+      <g fill="#fff" stroke="#C9CFD8" stroke-width="1.5"><rect x="420" y="304" width="9" height="106"/><rect x="436" y="304" width="9" height="106"/><rect x="452" y="304" width="9" height="106"/><rect x="468" y="304" width="9" height="106"/><rect x="484" y="304" width="9" height="106"/><rect x="500" y="304" width="9" height="106"/></g>
+      <line class="dash" x1="0" y1="345" x2="640" y2="345" stroke="#FFE27A" stroke-width="6" stroke-dasharray="30 22"/>
+      <!-- señales -->
+      <g><rect x="44" y="196" width="5" height="92" fill="#8A95A5"/><polygon points="46.5,134 67,142 75,162 67,182 46.5,190 26,182 18,162 26,142" fill="#FF8A80" stroke="#1F2A37" stroke-width="3" transform="translate(0,4)"/><text x="46.5" y="171" text-anchor="middle" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="700" font-size="17" fill="#1F2A37">ALTO</text></g>
+      <g><rect x="124" y="198" width="5" height="90" fill="#8A95A5"/><polygon points="96,148 156,148 126,202" fill="#fff" stroke="#FF8A80" stroke-width="9" stroke-linejoin="round"/><text x="126" y="176" text-anchor="middle" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="700" font-size="11" fill="#1F2A37">CEDA</text></g>
+      <g><rect x="204" y="206" width="5" height="82" fill="#8A95A5"/><rect x="182" y="154" width="50" height="50" rx="6" fill="#FFD23F" stroke="#1F2A37" stroke-width="3" transform="rotate(45 207 179)"/><circle cx="207" cy="162" r="5" fill="#1F2A37"/><path d="M207 168v16m0 0-7 12m7-12 7 12M199 175l8-3 8 3" stroke="#1F2A37" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+      <g><rect x="286" y="200" width="5" height="88" fill="#8A95A5"/><circle cx="288" cy="170" r="30" fill="#fff" stroke="#FF8A80" stroke-width="7"/><text x="288" y="181" text-anchor="middle" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="700" font-size="32" fill="#1F2A37">30</text></g>
+      <g><rect x="366" y="200" width="5" height="88" fill="#8A95A5"/><circle cx="368" cy="170" r="30" fill="#6EC1F7" stroke="#FF8A80" stroke-width="6"/><text x="368" y="181" text-anchor="middle" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="700" font-size="32" fill="#1F2A37">E</text><line x1="348" y1="190" x2="388" y2="150" stroke="#FF8A80" stroke-width="6"/></g>
+      <!-- semáforo -->
+      <rect x="577" y="150" width="6" height="140" fill="#8A95A5"/>
+      <rect x="555" y="36" width="50" height="118" rx="10" fill="#5B6B7C" stroke="#1F2A37" stroke-width="3"/>
+      <circle class="l-r" cx="580" cy="66" r="13" fill="#FF8A80"/><circle class="l-a" cx="580" cy="95" r="13" fill="#FFD23F"/><circle class="l-v" cx="580" cy="124" r="13" fill="#7ED9A6"/>
+      <!-- conos -->
+      <g transform="translate(396 272)"><path d="M11 0 20 22H2z" fill="#FFB86B" stroke="#1F2A37" stroke-width="2"/><rect x="0" y="22" width="22" height="4" fill="#1F2A37"/></g>
+      <!-- peatón -->
+      <g class="peaton-g"><g><circle cx="0" cy="-26" r="5" fill="#1F2A37"/><path d="M0-21V-8" stroke="#1F2A37" stroke-width="3.5" stroke-linecap="round"/><line class="pierna p1" x1="0" y1="-8" x2="0" y2="5" stroke="#1F2A37" stroke-width="3.5" stroke-linecap="round"/><line class="pierna p2" x1="0" y1="-8" x2="0" y2="5" stroke="#1F2A37" stroke-width="3.5" stroke-linecap="round"/></g></g>
+      <!-- bici -->
+      <g class="bici-h"><g><g transform="translate(14 32)"><g class="rueda"><circle r="12" fill="none" stroke="#1F2A37" stroke-width="3"/><path d="M-12 0H12M0-12V12" stroke="#1F2A37" stroke-width="1.4"/></g></g><g transform="translate(58 32)"><g class="rueda"><circle r="12" fill="none" stroke="#1F2A37" stroke-width="3"/><path d="M-12 0H12M0-12V12" stroke="#1F2A37" stroke-width="1.4"/></g></g><path d="M14 32 28 32 40 14 58 32M28 32 24 14M20 14h9M40 14h10" fill="none" stroke="#7ED9A6" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="35" cy="-2" r="5.5" fill="#1F2A37"/><path d="M35 4 30 14M35 5l10 7" stroke="#1F2A37" stroke-width="3.4" stroke-linecap="round" fill="none"/></g></g>
+      <!-- autobús -->
+      <g class="bus-h"><g transform="scale(-1 1) translate(-150 0)"><rect x="2" y="0" width="146" height="40" rx="9" fill="#6EC1F7" stroke="#1F2A37" stroke-width="3"/><g fill="#EAF6FF" stroke="#1F2A37" stroke-width="2"><rect x="12" y="8" width="20" height="14" rx="3"/><rect x="38" y="8" width="20" height="14" rx="3"/><rect x="64" y="8" width="20" height="14" rx="3"/><rect x="90" y="8" width="20" height="14" rx="3"/><rect x="116" y="8" width="26" height="20" rx="3"/></g><circle cx="32" cy="42" r="9" fill="#1F2A37" stroke="#fff" stroke-width="3"/><circle cx="116" cy="42" r="9" fill="#1F2A37" stroke="#fff" stroke-width="3"/></g></g>
+      <g class="auto-h"><use href="#auto" width="110" height="54"/></g>
+    </svg>
+  </div>
+</section>
+
+<section class="sec" id="objetivo">
+  <div class="wrap">
+    <div class="cab"><p class="etiqueta">Punto de partida</p><h2>Objetivo general</h2></div>
+    <div class="objetivo-grid">
+      <div class="letrero"><p>Que los estudiantes universitarios identifiquen situaciones de riesgo vial, reflexionen sobre sus decisiones al desplazarse, comprendan las consecuencias de sus acciones y construyan alternativas que favorezcan una movilidad más segura y responsable.</p></div>
+      <div class="producto"><span class="etiqueta">Producto integrador</span><h3>Manual de movilidad segura</h3><p>Se construye en colectivo con lo que producen los cuatro bloques.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="recorrido">
+  <div class="wrap">
+    <div class="cab"><p class="etiqueta">Mapa de ruta</p><h2>El recorrido: 4 estaciones, 20 paradas</h2></div>
+    <p class="resumen">5 actividades por bloque, 1 hora por actividad. Toca una parada para abrir su detalle.</p>
+    <div id="mapa"></div>
+  </div>
+</section>
+
+<section class="sec" id="bloques">
+  <div class="wrap">
+    <div class="cab"><p class="etiqueta">Las actividades</p><h2>Los cuatro bloques</h2></div>
+    <div class="filtros" id="filtros">
+      <div class="grupo" role="group" aria-label="Filtrar por bloque" id="fgrupo"></div>
+      <div class="buscar"><label class="sr" for="q">Buscar por título, estrategia u objetivo</label><input id="q" type="search" placeholder="Buscar por título, estrategia u objetivo…" autocomplete="off"></div>
+      <button class="reiniciar" id="reiniciar" type="button">Borrar vistas</button>
+    </div>
+    <p class="estado" id="estado" aria-live="polite"></p>
+    <div id="bloques-lista"></div>
+  </div>
+</section>
+
+<section class="sec" id="evaluacion">
+  <div class="wrap">
+    <div class="cab"><p class="etiqueta">Cómo se acompaña el aprendizaje</p><h2>Marco de evaluación</h2></div>
+    <div class="eval-grid">
+      <article class="f-1"><h4>Un enfoque humano</h4><p>Formativo, humanista, cualitativo y participativo, alineado con los fundamentos de la Nueva Escuela Mexicana.</p></article>
+      <article class="f-2"><h4>Un proceso vivo</h4><p>La evaluación es acompañamiento, diálogo constante y metacognición. Se apoya en 20 estrategias diversificadas, una por actividad.</p></article>
+      <article class="f-3"><h4>Qué se hace visible</h4><p>La evolución de las reflexiones, la capacidad de argumentar decisiones viales, la sensibilidad hacia otros usuarios del espacio público y la disposición para transformar hábitos cotidianos.</p></article>
+      <article class="f-4"><h4>El error no se penaliza</h4><p>Se aprovecha como punto de partida para la conversación crítica y para volver a pensar las ideas en comunidad.</p></article>
+    </div>
+    <div class="sinlista"><span class="etiqueta">En esta propuesta no se usan</span><div><span>Exámenes</span><span>Listas de cotejo</span><span>Rúbricas estandarizadas</span><span>Escalas de valoración</span><span>Calificaciones numéricas</span></div></div>
+    <div class="nota" role="note"><svg aria-hidden="true"><use href="#i-info"/></svg><p><b>Nota pedagógica.</b> Las estrategias de evaluación son recursos pedagógicos compatibles con un enfoque formativo, cualitativo y humanista. Sus nombres son descriptivos para orientar la facilitación dialógica y no constituyen instrumentos formales, listas numéricas ni escalas cuantitativas de medición.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="sintesis">
+  <div class="wrap">
+    <div class="cab"><p class="etiqueta">De un vistazo</p><h2>Las 20 estrategias de evaluación</h2></div>
+    <div class="tabla-w" tabindex="0" role="region" aria-label="Tabla de las 20 estrategias"><table id="tabla"></table></div>
+    <div class="cab resumen-t" style="margin-top:44px"><p class="etiqueta">Organización de la intervención</p></div>
+    <div class="tabla-w" tabindex="0" role="region" aria-label="Síntesis por bloque"><table class="mini" id="tabla-b"></table></div>
+  </div>
+</section>
+</main>
+
+<footer class="cierre" id="cierre">
+  <div class="conos" aria-hidden="true">
+    <svg class="cono" width="44" height="52" viewBox="0 0 44 52"><rect x="2" y="44" width="40" height="6" rx="2" fill="#1F2A37"/><path d="M22 4 36 44H8z" fill="#FFB86B" stroke="#1F2A37" stroke-width="2"/><path d="M17 20h10l2.5 8h-15zM12.5 34h19l1.6 6H10.9z" fill="#fff"/></svg>
+    <svg class="cono" style="animation-delay:.25s" width="44" height="52" viewBox="0 0 44 52"><rect x="2" y="44" width="40" height="6" rx="2" fill="#1F2A37"/><path d="M22 4 36 44H8z" fill="#FFB86B" stroke="#1F2A37" stroke-width="2"/><path d="M17 20h10l2.5 8h-15zM12.5 34h19l1.6 6H10.9z" fill="#fff"/></svg>
+  </div>
+  <div class="wrap">
+    <svg class="bandera" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#1F2A37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-bandera"/></svg>
+    <h2>Llegaste a tu destino: <em>construyamos el Manual de movilidad segura</em></h2>
+    <p>Cada bloque aporta piezas: tarjetas de riesgos, rutas y protocolos, fichas de análisis y compromisos. La actividad 20 las reúne en una primera versión.</p>
+    <div class="btns"><button class="boton" type="button" id="ir20">Ver actividad 20</button><a class="boton sec2" href="#inicio" data-ir="inicio">Volver al inicio</a></div>
+  </div>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <div class="scrim" data-cerrar></div>
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="m-titulo"></section>
+</div>
+<div id="imprimible"></div>
+
+<script>
+const bloques=[{"n": 1, "titulo": "Reconocemos los riesgos: mirar la movilidad de otra manera", "objetivo": "Favorecer que los estudiantes identifiquen los principales riesgos presentes en sus desplazamientos cotidianos, reconozcan conductas que pueden poner en peligro su integridad y la de otras personas, y reflexionen sobre la importancia de adoptar prácticas de movilidad responsable.", "producto": "Conjunto de tarjetas de conductas seguras, identificación de riesgos y recomendaciones preventivas para el Manual de movilidad segura."}, {"n": 2, "titulo": "Tomamos decisiones seguras: actuar con responsabilidad", "objetivo": "Desarrollar la capacidad de analizar situaciones de movilidad, valorar alternativas y tomar decisiones responsables, considerando los riesgos, las condiciones del entorno y el bienestar de las personas involucradas.", "producto": "Rutas seguras, algoritmos de actuación y protocolos preventivos para el Manual de movilidad segura."}, {"n": 3, "titulo": "Analizamos las consecuencias y responsabilidades: comprender para prevenir", "objetivo": "Promover la reflexión crítica sobre las consecuencias de las conductas de riesgo vial y las responsabilidades compartidas, favoreciendo la empatía, el respeto y la construcción de alternativas preventivas.", "producto": "Fichas de análisis sobre responsabilidades, consecuencias, inclusión y recomendaciones para prevenir riesgos y responder responsablemente ante emergencias."}, {"n": 4, "titulo": "Transformamos nuestras prácticas: construimos una movilidad segura", "objetivo": "Integrar los aprendizajes para diseñar propuestas de mejora, asumir compromisos realistas y elaborar colaborativamente un Manual de movilidad segura que promueva prácticas responsables, inclusivas y preventivas.", "producto": "Primera versión del Manual de movilidad segura para estudiantes universitarios, construido colaborativamente a partir de los aprendizajes y productos de los cuatro bloques."}];
+const actividades=[{"n": 1, "bloque": 1, "titulo": "Luz verde, luz roja: ¡sobrevive al tráfico!", "objetivo": "Identificar conductas seguras y de riesgo en situaciones cotidianas de movilidad, mediante una dinámica participativa.", "recursos": "Tarjetas verdes, amarillas y rojas; tarjetas con situaciones de movilidad; hojas; plumones y cinta adhesiva.", "inicio": "El facilitador preguntará qué situaciones de riesgo han observado al trasladarse. Explicará el significado de los colores: verde para conductas seguras, amarillo para precaución y rojo para riesgo.", "desarrollo": "Se presentarán situaciones como cruzar sin observar, usar el teléfono mientras se camina por una zona de tránsito, respetar cruces peatonales, conducir después de consumir alcohol o utilizar casco en motocicleta. Los participantes elegirán un color, justificarán su decisión y escucharán otras opiniones. Finalmente propondrán una alternativa segura.", "cierre": "Cada participante completará la frase “Una conducta que puedo cambiar para trasladarme de manera más segura es…”. Se recuperarán las ideas principales.", "evidencia": "Reflexión breve sobre una conducta de riesgo y una alternativa segura.", "estrategia": "Parada de Minuto (One-Minute Pause)", "dinamica": "Momento de silencio reflexivo en el que cada estudiante escribe una idea que modificó su perspectiva inicial y la comparte en plenaria sin juzgar su validez.", "tipologia": "metacognición individual e intercambio rápido"}, {"n": 2, "bloque": 1, "titulo": "El semáforo humano", "objetivo": "Analizar situaciones de movilidad para distinguir entre conductas seguras, de precaución y de riesgo, justificando las decisiones.", "recursos": "Carteles verdes, amarillos y rojos; tarjetas con situaciones; hojas y plumones.", "inicio": "Se recuperará lo aprendido y se preguntará qué características permiten reconocer una conducta segura. Se explicará que los colores servirán para analizar, no solo clasificar.", "desarrollo": "Se colocarán tres carteles en diferentes espacios. El facilitador leerá situaciones relacionadas con peatones, ciclistas, motociclistas, pasajeros y conductores. Los participantes se ubicarán junto al color elegido y explicarán sus razones. Podrán cambiar de lugar si los argumentos de otros les permiten reconsiderar su decisión.", "cierre": "En equipos, elegirán una situación y formularán una recomendación segura. Las propuestas se compartirán para incorporarlas al manual.", "evidencia": "Recomendación escrita sobre una situación de movilidad.", "estrategia": "Silla de los Argumentos (Hot Seat)", "dinamica": "Un voluntario expone por qué cambió de color mientras el grupo identifica qué razón generó la persuasión empática.", "tipologia": "socialización del cambio de criterio"}, {"n": 3, "bloque": 1, "titulo": "Ponle la multa al carro", "objetivo": "Reconocer conductas de riesgo vial y analizar sus consecuencias, proponiendo alternativas preventivas.", "recursos": "Tarjetas con ilustraciones o descripciones de conductas viales; hojas de colores; plumones y cinta adhesiva.", "inicio": "Se preguntará qué significa la responsabilidad vial. Se aclarará que la actividad no busca castigar ni ridiculizar, sino comprender cómo prevenir riesgos.", "desarrollo": "En equipos analizarán situaciones como estacionarse sobre un cruce peatonal, ignorar una señal de alto, usar el celular al conducir o invadir una banqueta. Elaborarán una tarjeta simbólica que indique la conducta de riesgo, las personas afectadas, las posibles consecuencias y una alternativa preventiva.", "cierre": "Los equipos presentarán sus tarjetas y transformarán las advertencias en recomendaciones positivas.", "evidencia": "Tarjetas de prevención con conductas de riesgo, consecuencias y alternativas seguras.", "estrategia": "Constelación de Cuidado Mutuo", "dinamica": "Los equipos colocan sus tarjetas en un muro y tejen hilos simbólicos entre las recomendaciones que protegen a usuarios más vulnerables; se reflexiona sobre pasar de la culpa al cuidado colectivo.", "tipologia": "análisis colectivo del impacto ético"}, {"n": 4, "bloque": 1, "titulo": "Cazadores de riesgos viales", "objetivo": "Identificar riesgos en espacios de movilidad mediante imágenes y proponer medidas de prevención.", "recursos": "Fotografías o ilustraciones de calles, avenidas, cruces, paradas de transporte y estacionamientos; hojas; plumones y notas adhesivas.", "inicio": "Se preguntará qué lugares resultan complicados o inseguros para trasladarse. Se explicará que los participantes observarán el entorno para detectar riesgos que pueden pasar desapercibidos.", "desarrollo": "En equipos observarán imágenes e identificarán riesgos como vehículos sobre banquetas, falta de visibilidad, cruces poco accesibles o ausencia de señalización. Registrarán qué ocurre, quiénes podrían verse afectados, por qué representa un riesgo y qué cambio ayudaría a prevenirlo.", "cierre": "Se organizará una galería de imágenes y propuestas. Los participantes dejarán comentarios para enriquecer las ideas.", "evidencia": "Registro visual de riesgos y propuestas de mejora.", "estrategia": "Retroalimentación 3-2-1 Inclusiva", "dinamica": "Al recorrer la galería, cada participante deja notas con 3 aspectos claros, 2 preguntas orientadoras y 1 sugerencia para hacer la propuesta más accesible.", "tipologia": "comentarios estructurados entre pares"}, {"n": 5, "bloque": 1, "titulo": "Mitos y realidades de la movilidad", "objetivo": "Cuestionar creencias comunes sobre movilidad y contrastarlas con información confiable para fortalecer decisiones seguras.", "recursos": "Tarjetas con afirmaciones; información de fuentes institucionales confiables; hojas y plumones.", "inicio": "Se explicará que algunas creencias pueden influir en las decisiones aunque no sean correctas. Se presentarán ejemplos como “si voy cerca no necesito cinturón” o “si conozco el camino no necesito prestar tanta atención”.", "desarrollo": "Los equipos analizarán afirmaciones, compartirán lo que piensan y contrastarán sus respuestas con información institucional proporcionada. Elaborarán una tarjeta con la afirmación, una explicación fundamentada y una recomendación segura.", "cierre": "Los equipos compartirán sus tarjetas y reflexionarás sobre la importancia de verificar la información.", "evidencia": "Tarjeta informativa y reflexión sobre una creencia reconsiderada.", "estrategia": "Técnica \"Antes pensaba / Ahora comprendo\"", "dinamica": "Cada participante expresa o escribe en una tarjeta de salida cómo transformó una creencia arraigada.", "tipologia": "contraste de concepciones previas"}, {"n": 6, "bloque": 2, "titulo": "¿Qué harías tú?", "objetivo": "Analizar situaciones cotidianas de movilidad y proponer decisiones seguras, argumentando sus razones y consecuencias.", "recursos": "Tarjetas con casos hipotéticos; hojas; plumones y tarjetas con alternativas.", "inicio": "Se preguntará si alguna vez han tenido que decidir entre llegar rápido y trasladarse de forma segura. Se explicará que analizarán situaciones en las que deberán valorar alternativas.", "desarrollo": "Los equipos recibirán casos: cruzar fuera del cruce por llegar a tiempo, viajar con un conductor que ha consumido alcohol, elegir una ruta poco iluminada o responder mensajes al conducir. Analizarán el problema, las opciones, los riesgos y la decisión más segura.", "cierre": "Cada equipo reformulará su decisión tomando en cuenta los argumentos escuchados y redactará una recomendación aplicable a situaciones semejantes.", "evidencia": "Resolución argumentada de un caso de movilidad.", "estrategia": "Estudio de Caso Dialógico en Pecera (Fishbowl)", "dinamica": "Un grupo central debate los dilemas de decidir bajo presión social o prisa; el círculo exterior observa y luego aporta alternativas que priorizan la seguridad sobre la rapidez.", "tipologia": "discusión activa en círculos concéntricos"}, {"n": 7, "bloque": 2, "titulo": "Misión: llegar a la universidad", "objetivo": "Diseñar una ruta hipotética hacia la universidad que considere seguridad, accesibilidad y condiciones del entorno.", "recursos": "Mapas o croquis ficticios; tarjetas con imprevistos; hojas; plumones y notas adhesivas.", "inicio": "Se planteará el reto de llegar a la universidad considerando que la ruta más rápida no siempre es la más segura.", "desarrollo": "Los equipos trazarán una ruta en un mapa con calles, cruces, paradas y puntos de riesgo. Considerarán cruces seguros, visibilidad, transporte y accesibilidad. Luego recibirán un imprevisto, como el cierre de una calle, y deberán ajustar el recorrido.", "cierre": "Cada equipo presentará su ruta y explicará los cambios realizados. Se recuperarán recomendaciones útiles para los trayectos cotidianos.", "evidencia": "Mapa con ruta propuesta, justificación y alternativas ante imprevistos.", "estrategia": "Revisión de Pares \"Paso del Caminante\"", "dinamica": "Un representante camina simbólicamente sobre el mapa de otro equipo y pregunta, por ejemplo, \"¿Qué opción tengo si aquí se apaga la luz?\".", "tipologia": "colectivo mediante preguntas guía"}, {"n": 8, "bloque": 2, "titulo": "El algoritmo de la seguridad", "objetivo": "Organizar una secuencia de acciones para responder de forma segura ante situaciones frecuentes de riesgo vial.", "recursos": "Tarjetas con pasos de actuación; hojas; plumones y ejemplos de situaciones.", "inicio": "Se preguntará qué pasos siguen antes de cruzar una calle o iniciar un trayecto. Se explicará que un algoritmo es una secuencia ordenada para resolver una situación.", "desarrollo": "Los equipos ordenarán tarjetas con acciones para cruzar una avenida de manera segura, como observar el entorno, identificar el cruce, atender las señales y verificar que los vehículos se detengan. Después diseñarán una secuencia para otra situación.", "cierre": "Los equipos compartirán sus secuencias y recibirán sugerencias para hacerlas más claras y completas.", "evidencia": "Algoritmo de actuación segura revisado y mejorado.", "estrategia": "Simulación Hablada en Duplas", "dinamica": "En parejas, uno dramatiza verbalmente los pasos como si guiara a un amigo en tiempo real e identifica si faltan instrucciones críticas de autocuidado.", "tipologia": "verificación práctica en parejas"}, {"n": 9, "bloque": 2, "titulo": "La ruta de las decisiones", "objetivo": "Comparar alternativas de desplazamiento y valorar sus ventajas y riesgos para elegir opciones seguras y responsables.", "recursos": "Tarjetas con escenarios; croquis de rutas; hojas; plumones y notas adhesivas.", "inicio": "Se presentará una situación en la que un estudiante tiene tres rutas para llegar a una actividad universitaria, con diferentes tiempos y condiciones.", "desarrollo": "Los equipos compararán las rutas considerando riesgos, entorno, tiempo, accesibilidad y necesidades de las personas. Construirán un esquema de decisiones. Se introducirán cambios como lluvia o cierre de una calle para que reconsideren sus opciones.", "cierre": "Cada equipo explicará qué ruta elegiría y qué condiciones podrían hacerle cambiar de opinión.", "evidencia": "Esquema comparativo de rutas y justificación.", "estrategia": "Círculo de Adaptabilidad y Resiliencia", "dinamica": "Plenaria con escenarios cambiantes en la mesa central; los equipos reflexionan sobre la flexibilidad de su razonamiento ante imprevistos ambientales o climáticos.", "tipologia": "reflexión ante imprevistos en plenaria"}, {"n": 10, "bloque": 2, "titulo": "Diseñemos un protocolo de seguridad", "objetivo": "Elaborar un protocolo con recomendaciones claras y viables para prevenir riesgos durante los desplazamientos universitarios.", "recursos": "Hojas o cartulinas; plumones; tarjetas con riesgos; ejemplos de recomendaciones e información institucional.", "inicio": "Se preguntará qué información necesita conocer un estudiante para trasladarse de manera segura. Se explicará qué es un protocolo y para qué sirve.", "desarrollo": "Los equipos elegirán una situación, como caminar hacia la universidad, usar transporte público o trasladarse en bicicleta. Elaborarán un protocolo con propósito, medidas preventivas, pasos, acciones que conviene evitar y fuentes confiables. Después intercambiarán los documentos para revisarlos.", "cierre": "Los equipos presentarán la versión revisada y explicarán los cambios incorporados. Los protocolos se conservarán para el manual.", "evidencia": "Protocolo de seguridad revisado y corregido.", "estrategia": "Técnica del Consultor Externo", "dinamica": "Cada equipo envía un \"consultor\" a otro grupo para leer su protocolo en voz alta e identificar si las frases son sencillas, directas y aplicables sin ambigüedades.", "tipologia": "validación cruzada de comprensibilidad"}, {"n": 11, "bloque": 3, "titulo": "El juicio vial", "objetivo": "Analizar una situación hipotética de riesgo vial para identificar decisiones, consecuencias y alternativas preventivas.", "recursos": "Tarjetas con casos; hojas; plumones y tarjetas de roles.", "inicio": "Se explicará que el análisis no busca ridiculizar ni castigar, sino comprender cómo las decisiones y las condiciones del entorno influyen en una situación de riesgo.", "desarrollo": "Se presentará un caso en el que un peatón cruza sin verificar y un conductor se aproxima sin prestar suficiente atención. Los equipos asumirán perspectivas de peatón, conductor, testigo y persona que propone prevención. Analizarán qué ocurrió, qué decisiones influyeron, quiénes podrían resultar afectados y qué pudo prevenirlo.", "cierre": "El grupo construirá una conclusión colectiva con medidas para evitar situaciones semejantes.", "evidencia": "Conclusión grupal con acciones para prevenir situaciones semejantes.", "estrategia": "Inversión de Perspectiva (Role-Reversal Reflection)", "dinamica": "Al concluir el caso, dialogan sobre el cambio emocional al pasar del rol de conductor al de peatón o testigo.", "tipologia": "evaluación de empatía actoral"}, {"n": 12, "bloque": 3, "titulo": "¿Quién tiene la responsabilidad?", "objetivo": "Reconocer las responsabilidades de los usuarios de la vía y analizar cómo la colaboración y el respeto contribuyen a una movilidad segura.", "recursos": "Tarjetas con situaciones; imágenes de peatones, ciclistas, motociclistas, conductores y pasajeros; hojas y plumones.", "inicio": "Se preguntará quiénes son responsables de la seguridad vial. Se explicará que las responsabilidades dependen de las acciones, las normas y las condiciones del entorno.", "desarrollo": "Los equipos analizarán situaciones, como un vehículo estacionado sobre una banqueta. Identificarán personas involucradas, responsabilidades, posibles afectados, acciones de mejora y condiciones de infraestructura que también deben atenderse. Elaborarán un esquema de responsabilidades individuales, compartidas e institucionales.", "cierre": "Los equipos compartirán sus conclusiones y reflexionarán sobre la importancia de no atribuir todos los problemas solo a decisiones individuales.", "evidencia": "Esquema de responsabilidades individuales, compartidas e institucionales.", "estrategia": "Matriz Dialógica de Sistemicidad", "dinamica": "El facilitador formula preguntas de problematización para distinguir causas individuales de la responsabilidad estructural e institucional.", "tipologia": "análisis sistémico guiado por el facilitador"}, {"n": 13, "bloque": 3, "titulo": "La ruleta de las consecuencias", "objetivo": "Relacionar conductas de riesgo con posibles consecuencias personales y comunitarias, proponiendo medidas preventivas.", "recursos": "Ruleta física o de cartulina; tarjetas con conductas y consecuencias; hojas y plumones.", "inicio": "Se explicará que una misma conducta puede tener consecuencias distintas según las circunstancias. Se conversará sobre la importancia de anticiparlas.", "desarrollo": "Por turnos, los equipos tomarán tarjetas con conductas como distraerse al conducir o ignorar señales. Analizarán posibles consecuencias para la persona y la comunidad, y propondrán una medida preventiva.", "cierre": "Cada equipo elegirá una conducta y redactará una recomendación preventiva para el manual.", "evidencia": "Cadena de relación entre conducta, consecuencias y prevención.", "estrategia": "Mapeo de Impacto en Red (Ripple Effect Mapping)", "dinamica": "Trazan gráficamente cómo un simple distractor genera ondas de impacto en la comunidad, sin infundir miedo.", "tipologia": "visualización reflexiva del alcance"}, {"n": 14, "bloque": 3, "titulo": "Cambia de lugar: mira desde otra perspectiva", "objetivo": "Desarrollar empatía hacia diferentes usuarios de la vía y proponer acciones que favorezcan una movilidad respetuosa e inclusiva.", "recursos": "Tarjetas con perfiles de usuarios; imágenes de espacios públicos; hojas y plumones.", "inicio": "Se preguntará si todas las personas experimentan las calles y el transporte de la misma manera. Se explicará que las necesidades varían según edad, discapacidad y condiciones del entorno.", "desarrollo": "Los equipos recibirán perfiles de usuarios, como una persona con discapacidad visual, alguien que utiliza silla de ruedas, una persona adulta mayor o un ciclista. Analizarán una imagen de un espacio y propondrán mejoras en señalización, cruces, banquetas, iluminación y accesibilidad.", "cierre": "Los equipos presentarán sus propuestas y compartirán qué aprendieron al analizar el espacio desde otra perspectiva.", "evidencia": "Propuesta de mejora de un espacio de movilidad desde una perspectiva inclusiva.", "estrategia": "Caminata Empática de Asiento (Empathy Walkthrough)", "dinamica": "Reflexión guiada por preguntas como \"¿Qué obstáculo no podrías esquivar si usaras bastón en esa esquina?\".", "tipologia": "sensibilización sobre inclusión urbana"}, {"n": 15, "bloque": 3, "titulo": "Del accidente a la prevención", "objetivo": "Analizar una situación hipotética de emergencia vial para reconocer medidas básicas de actuación segura y la importancia de solicitar ayuda.", "recursos": "Tarjetas con casos; hojas; plumones; recomendaciones generales de actuación e información oficial de emergencias.", "inicio": "Se preguntará qué harían al presenciar un incidente vial. Se aclarará que actuar responsablemente implica protegerse, valorar el lugar y solicitar ayuda.", "desarrollo": "Los equipos analizarán casos hipotéticos y organizarán recomendaciones: valorar peligros, no exponerse al tránsito, solicitar ayuda a los servicios de emergencia, proporcionar información clara y seguir instrucciones del personal especializado. Evitarán mover a personas lesionadas salvo que exista un peligro inmediato que lo haga necesario.", "cierre": "Los equipos compartirán una secuencia de actuación y el facilitador aclarará dudas, recordando que se deben seguir las indicaciones de los servicios de emergencia.", "evidencia": "Secuencia de actuación segura ante una emergencia vial.", "estrategia": "Círculo de Calma y Certeza Colectiva", "dinamica": "Plenaria de cierre para resolver dudas e inseguridades, transformando los desaciertos iniciales en certeza y serenidad.", "tipologia": "acompañamiento ante situaciones de crisis"}, {"n": 16, "bloque": 4, "titulo": "El mapa del peligro", "objetivo": "Identificar riesgos en trayectos hacia la universidad y proponer medidas de prevención y alternativas seguras.", "recursos": "Mapas o croquis; hojas; plumones; notas adhesivas e imágenes de señalización.", "inicio": "Se preguntará qué características hacen que un trayecto sea seguro o riesgoso. Se explicará que no es necesario compartir domicilios ni ubicaciones personales precisas.", "desarrollo": "Los equipos identificarán en un mapa riesgos como cruces complicados, banquetas obstruidas o poca iluminación. Para cada punto indicarán el riesgo, las personas afectadas, las razones y una propuesta de mejora.", "cierre": "Se expondrán los mapas y se distinguirán las medidas individuales de las que requieren intervención institucional.", "evidencia": "Mapa de riesgos con propuestas de prevención y mejora.", "estrategia": "Asamblea Comunitaria Estudiantil", "dinamica": "Foro simulado donde se dialoga qué propuestas son viables de gestionar por la comunidad y cuáles por las autoridades de la institución.", "tipologia": "deliberación y viabilidad de gestión"}, {"n": 17, "bloque": 4, "titulo": "La subasta de riesgos", "objetivo": "Priorizar riesgos de movilidad según sus posibles consecuencias y la necesidad de atención preventiva.", "recursos": "Tarjetas con riesgos; fichas de papel que representen recursos limitados; hojas y plumones.", "inicio": "Se explicará que los riesgos pueden requerir diferentes niveles de atención. La subasta será simbólica, sin premiar ni enfrentar a los equipos.", "desarrollo": "Los equipos recibirán tarjetas de riesgos y fichas simbólicas para distribuir según sus prioridades. Considerarán gravedad potencial, probabilidad, personas afectadas, posibilidades de prevención y necesidad de intervención institucional. Justificarán su selección.", "cierre": "El grupo comparará prioridades y elaborará una lista colectiva de riesgos y acciones preventivas.", "evidencia": "Lista argumentada de riesgos prioritarios y acciones preventivas.", "estrategia": "Consenso por Diamante (Diamond Ranking Dialogue)", "dinamica": "Los equipos reorganizan oralmente la prioridad de los riesgos escuchando los motivos de los demás, pasando de intereses personales a consensos colectivos.", "tipologia": "priorización dialógica en equipos"}, {"n": 18, "bloque": 4, "titulo": "Diseña al peor conductor del mundo", "objetivo": "Reconocer conductas irresponsables y transformarlas en prácticas seguras mediante una actividad creativa.", "recursos": "Hojas o cartulinas; plumones; colores; tarjetas de conductas de riesgo e información de seguridad vial.", "inicio": "Se propondrá crear un personaje ficticio que represente conductas irresponsables. Se aclarará que no se busca burlarse de personas reales.", "desarrollo": "Los equipos diseñarán el personaje y describirán conductas como ignorar señales, distraerse con el teléfono o no respetar a los peatones. Después crearán una versión transformada que incluya alternativas responsables y explicarán los cambios.", "cierre": "Se expondrán los personajes y se recuperarán recomendaciones para el manual.", "evidencia": "Personaje ilustrado con conductas de riesgo y su transformación en prácticas seguras.", "estrategia": "Galería de Metamorfosis Creativa", "dinamica": "Los compañeros recorren la exposición comentando la plausibilidad de los cambios del personaje y sugiriendo pequeñas acciones diarias para sostenerlos.", "tipologia": "valoración cualitativa de transformaciones"}, {"n": 19, "bloque": 4, "titulo": "El compromiso que nadie puede ver", "objetivo": "Reflexionar sobre las prácticas personales de movilidad y formular compromisos realistas que contribuyan a la seguridad propia y colectiva.", "recursos": "Hojas o tarjetas; sobres; plumones y formato de reflexión personal.", "inicio": "Se recuperarán aprendizajes de los bloques anteriores con preguntas sobre riesgos identificados y prácticas que podrían mejorar. Se aclarará que nadie estará obligado a compartir experiencias privadas.", "desarrollo": "Cada participante completará una reflexión: una práctica que desea mantener, una conducta que desea mejorar, una acción concreta, una dificultad posible y una alternativa para superarla. Se promoverán compromisos realistas, como planear trayectos o evitar distracciones.", "cierre": "Quienes lo deseen compartirán una idea general. El grupo formulará una frase colectiva sobre responsabilidad y cuidado mutuo.", "evidencia": "Compromiso personal de movilidad segura y reflexión individual.", "estrategia": "Carta Introspectiva de Autoafirmación", "dinamica": "Ejercicio estrictamente personal y confidencial, sin mediación ni revisión externa; la evaluación es la autoconciencia interna.", "tipologia": "autoevaluación confidencial"}, {"n": 20, "bloque": 4, "titulo": "Construimos el Manual de movilidad segura", "objetivo": "Integrar aprendizajes y productos en un manual con recomendaciones claras, prácticas preventivas y propuestas para la comunidad universitaria.", "recursos": "Productos de actividades anteriores; hojas o cartulinas; computadora si está disponible; plumones; material institucional y carpetas.", "inicio": "Se recordarán los productos de cada bloque y se explicará la importancia de convertirlos en recomendaciones útiles para la comunidad universitaria.", "desarrollo": "Los equipos revisarán y organizarán los materiales. El manual podrá incluir: presentación y propósito; principales riesgos; conductas seguras; recomendaciones para distintos usuarios; planeación de rutas; protocolos preventivos y de emergencia; responsabilidades; propuestas para el entorno universitario; compromisos y fuentes institucionales. Verificarán claridad y confiabilidad.", "cierre": "Se revisará colectivamente la primera versión. Los participantes señalarán contenidos útiles y aspectos por fortalecer, y acordarán ajustes para mejorar el documento.", "evidencia": "Primera versión integrada del Manual de movilidad segura, con observaciones y propuestas de mejora.", "estrategia": "Círculo de Cierre y Ronda de Reconocimiento", "dinamica": "En asamblea final leen colectivamente el manual terminado y expresan en una ronda de palabras lo que aportaron y aprendieron durante las 20 sesiones.", "tipologia": "evaluación global del proceso vivido"}];
+const META={
+  1:{icon:'i-ojo',corto:'Reconocemos los riesgos'},
+  2:{icon:'i-ruta',corto:'Tomamos decisiones seguras'},
+  3:{icon:'i-balanza',corto:'Analizamos consecuencias'},
+  4:{icon:'i-bandera',corto:'Transformamos nuestras prácticas'}
+};
+const PRODUCTOS={1:'Tarjetas de riesgos y recomendaciones preventivas',2:'Rutas, algoritmos y protocolos de seguridad',3:'Fichas de análisis y propuestas preventivas',4:'Manual de movilidad segura'};
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const senal=b=>`<span class="senal" aria-hidden="true"><svg><use href="#${META[b].icon}"/></svg></span>`;
+const porN=n=>actividades.find(a=>a.n===n);
+const cap=s=>{s=s.replace(/\.$/,'');return s.charAt(0).toUpperCase()+s.slice(1)+'.'};
+
+let vistas=new Set();
+try{vistas=new Set(JSON.parse(localStorage.getItem('ms_vistas')||'[]'))}catch(e){}
+function guardar(){try{localStorage.setItem('ms_vistas',JSON.stringify([...vistas]))}catch(e){}}
+
+function renderMapa(){
+  $('#mapa').innerHTML=bloques.map(b=>`
+  <div class="ruta" data-b="${b.n}">
+    <div class="ruta-n">${senal(b.n)}<b>Bloque ${b.n}<br>${esc(META[b.n].corto)}</b></div>
+    <div class="paradas"><svg class="mini-auto" viewBox="0 0 110 54" aria-hidden="true"><use href="#auto"/></svg>${actividades.filter(a=>a.bloque===b.n).map(a=>`
+      <button type="button" class="parada" data-abrir="${a.n}" data-n="${a.n}" aria-label="Actividad ${a.n}: ${esc(a.titulo)}"><span class="num">${a.n}</span><span class="tt">${esc(a.titulo)}</span></button>`).join('')}</div>
+  </div>`).join('');
+}
+function tarjeta(a){
+  return `<div class="card" data-n="${a.n}" data-b="${a.bloque}">
+    <div class="card-top"><span class="nro" aria-hidden="true">${a.n}</span>
+      <label class="chk"><input type="checkbox" data-vista="${a.n}" aria-label="Marcar la actividad ${a.n} como vista"><span>Vista</span></label></div>
+    <h4><button type="button" data-abrir="${a.n}">${esc(a.titulo)}</button></h4>
+    <p>${esc(a.objetivo)}</p>
+    <span class="est-chip">${esc(a.estrategia)}</span>
+  </div>`;
+}
+function renderBloques(){
+  $('#fgrupo').innerHTML=`<button type="button" class="fbtn todos" data-f="0" aria-pressed="true">Todos</button>`+
+    bloques.map(b=>`<button type="button" class="fbtn f-${b.n}" data-b="${b.n}" data-f="${b.n}" aria-pressed="false">${senal(b.n)}Bloque ${b.n}</button>`).join('');
+  $('#bloques-lista').innerHTML=bloques.map(b=>`
+  <article class="bloque" id="bloque-${b.n}" data-b="${b.n}" aria-labelledby="bt-${b.n}">
+    <div class="b-cab">${senal(b.n)}
+      <div><p class="etiqueta"><b>Bloque ${b.n}</b> · actividades ${(b.n-1)*5+1}–${b.n*5}</p><h3 id="bt-${b.n}">${esc(b.titulo)}</h3></div>
+      <div class="progreso"><b id="pb-${b.n}">0/5</b><small>vistas</small><div class="barra"><i id="pbar-${b.n}"></i></div></div>
+    </div>
+    <div class="b-info">
+      <div><span class="etiqueta">Objetivo del bloque</span><p>${esc(b.objetivo)}</p></div>
+      <div><span class="etiqueta">Producto del bloque</span><p>${esc(cap(b.producto))}</p></div>
+    </div>
+    <div class="tarjetas">${actividades.filter(a=>a.bloque===b.n).map(tarjeta).join('')}</div>
+  </article>`).join('')+`<div class="vacio" id="vacio" hidden>Ninguna actividad coincide con la búsqueda. Prueba con otra palabra o cambia de bloque.</div>`;
+}
+function renderTablas(){
+  $('#tabla').innerHTML=`<thead><tr><th scope="col">Act.</th><th scope="col">Bloque</th><th scope="col">Estrategia de evaluación</th><th scope="col">Tipología cualitativa</th></tr></thead><tbody>`+
+  actividades.map(a=>`<tr data-b="${a.bloque}"><td class="act"><button type="button" data-abrir="${a.n}" aria-label="Abrir actividad ${a.n}: ${esc(a.titulo)}">${a.n}. ${esc(a.titulo)}</button></td><td class="bl"><span class="dot" aria-hidden="true"></span>${a.bloque}</td><td><b>${esc(a.estrategia)}</b></td><td>${esc(cap(a.tipologia))}</td></tr>`).join('')+'</tbody>';
+  $('#tabla-b').innerHTML=`<thead><tr><th scope="col">Bloque</th><th scope="col">Actividades</th><th scope="col">Duración</th><th scope="col">Producto principal</th></tr></thead><tbody>`+
+  bloques.map(b=>`<tr><th scope="row">${b.n}. ${esc(META[b.n].corto)}</th><td>${(b.n-1)*5+1}–${b.n*5}</td><td>5 horas</td><td>${esc(PRODUCTOS[b.n])}</td></tr>`).join('')+
+  `</tbody><tfoot><tr><th scope="row">Total</th><td>20 actividades</td><td>20 horas</td><td>Manual de movilidad segura</td></tr></tfoot>`;
+}
+
+function actualizarProgreso(){
+  $('#cont-n').textContent=vistas.size;
+  bloques.forEach(b=>{const t=actividades.filter(a=>a.bloque===b.n&&vistas.has(a.n)).length;$('#pb-'+b.n).textContent=t+'/5';$('#pbar-'+b.n).style.width=(t*20)+'%'});
+  $$('[data-vista]').forEach(i=>{i.checked=vistas.has(+i.dataset.vista)});
+  $$('.parada').forEach(p=>p.classList.toggle('vista',vistas.has(+p.dataset.n)));
+}
+const REDUCE=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function confeti(x,y,n){
+  if(REDUCE)return;
+  const cols=['#FFD23F','#7ED9A6','#FF8A80','#6EC1F7','#FFB86B'];
+  for(let i=0;i<n;i++){
+    const d=document.createElement('i');d.className='confeti';d.style.background=cols[i%cols.length];document.body.appendChild(d);
+    const ang=Math.random()*Math.PI*2,f=80+Math.random()*200,dx=Math.cos(ang)*f,dy=Math.sin(ang)*f-110;
+    const an=d.animate([{transform:`translate(${x}px,${y}px) rotate(0)`,opacity:1},{transform:`translate(${x+dx}px,${y+dy}px) rotate(${Math.random()*540}deg)`,opacity:1,offset:.45},{transform:`translate(${x+dx*1.1}px,${y+dy+340}px) rotate(${Math.random()*900}deg)`,opacity:0}],{duration:1300+Math.random()*800,easing:'cubic-bezier(.2,.7,.4,1)'});
+    an.onfinish=()=>d.remove();
+  }
+}
+function aviso(t){if(REDUCE)return;const d=document.createElement('div');d.className='aviso-t';d.setAttribute('role','status');d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),3000)}
+function marcar(n,v,orig){
+  const a=porN(n),antes=actividades.filter(x=>x.bloque===a.bloque&&vistas.has(x.n)).length;
+  if(v)vistas.add(n);else vistas.delete(n);guardar();actualizarProgreso();
+  if(!v)return;
+  const r=orig?orig.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2,width:0,height:0};
+  const x=r.left+r.width/2,y=r.top+r.height/2;
+  if(vistas.size===20){confeti(x,y,70);aviso('¡Recorrido completo!')}
+  else if(antes===4){confeti(x,y,40);aviso('Bloque '+a.bloque+' recorrido')}
+}
+
+let fb=0;
+function filtrar(){
+  const q=norm($('#q').value.trim());let total=0;
+  actividades.forEach(a=>{
+    const card=$(`.card[data-n="${a.n}"]`);
+    const ok=(fb===0||a.bloque===fb)&&(!q||norm([a.titulo,a.estrategia,a.objetivo,a.tipologia].join(' ')).includes(q));
+    card.hidden=!ok;if(ok)total++;
+  });
+  bloques.forEach(b=>{$('#bloque-'+b.n).hidden=!$$('.card',$('#bloque-'+b.n)).some(c=>!c.hidden)});
+  $('#vacio').hidden=total>0;
+  $('#estado').textContent=(q||fb)?`${total} de 20 actividades`:'';
+  $$('.fbtn').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.f===fb)));
+}
+
+function chipsRecursos(t){return t.replace(/\.$/,'').split(/;\s*/).map(s=>s.trim()).filter(Boolean).map(s=>`<span>${esc(s.charAt(0).toUpperCase()+s.slice(1))}</span>`).join('')}
+
+let actual=0,disparador=null;
+const TABS=[['inicio','Inicio','10 min'],['desarrollo','Desarrollo','35 min'],['cierre','Cierre','15 min']];
+function abrir(n,desde){disparador=desde||document.activeElement;renderModal(n,'inicio');$('#modal').hidden=false;document.body.style.overflow='hidden';$('.cerrar',$('#sheet')).focus()}
+function cerrar(){$('#modal').hidden=true;document.body.style.overflow='';if(disparador&&document.contains(disparador))disparador.focus()}
+function renderModal(n,tab){
+  actual=n;const a=porN(n);const sheet=$('#sheet');sheet.dataset.b=a.bloque;
+  sheet.innerHTML=`
+  <div class="sheet-cab">${senal(a.bloque)}
+    <div class="t"><p class="etiqueta">Bloque ${a.bloque} · Actividad ${a.n} de 20</p><h2 id="m-titulo">${esc(a.titulo)}</h2></div>
+    <button class="cerrar" type="button" data-cerrar aria-label="Cerrar detalle">✕</button>
+  </div>
+  <div class="sheet-cuerpo" id="m-cuerpo">
+    <label class="chk" style="align-self:flex-start"><input type="checkbox" id="m-vista" ${vistas.has(n)?'checked':''}><span>Marcar como vista</span></label>
+    <div><h3>Objetivo específico</h3><p>${esc(a.objetivo)}</p></div>
+    <div><h3>Duración</h3>
+      <div class="dur"><svg aria-hidden="true"><use href="#i-reloj"/></svg>1 hora · 60 minutos</div>
+      <div class="tiempo" role="tablist" aria-label="Momentos de la sesión">${TABS.map(([k,l,m])=>`<button class="seg" role="tab" type="button" data-k="${k}" id="tab-${k}" aria-controls="m-panel" aria-selected="${k===tab}" tabindex="${k===tab?0:-1}"><b>${l}</b>${m}</button>`).join('')}</div>
+      <div class="panel" id="m-panel" role="tabpanel" tabindex="0" aria-labelledby="tab-${tab}"><p>${esc(a[tab])}</p></div>
+    </div>
+    <div><h3>Recursos</h3><div class="chips">${chipsRecursos(a.recursos)}</div></div>
+    <div><h3>Evidencia de aprendizaje</h3><p>${esc(a.evidencia)}</p></div>
+    <div class="estrategia" role="group" aria-labelledby="e-nombre">
+      <p class="etiqueta"><svg aria-hidden="true"><use href="#i-info"/></svg>Evaluación formativa específica</p>
+      <h3 id="e-nombre">${esc(a.estrategia)}</h3>
+      <p>${esc(a.dinamica)}</p>
+      <span class="tipo">Tipología: ${esc(a.tipologia)}</span>
+    </div>
+  </div>
+  <div class="sheet-pie">
+    <button class="nav-b" type="button" data-nav="-1" ${n===1?'disabled':''}>← Anterior</button>
+    <span class="pos">${n} / 20</span>
+    <button class="nav-b" type="button" data-nav="1" ${n===20?'disabled':''}>Siguiente →</button>
+  </div>`;
+}
+function cambiarTab(k){
+  const a=porN(actual);
+  $$('.seg').forEach(s=>{const on=s.dataset.k===k;s.setAttribute('aria-selected',on);s.tabIndex=on?0:-1});
+  const p=$('#m-panel');p.setAttribute('aria-labelledby','tab-'+k);p.innerHTML=`<p>${esc(a[k])}</p>`;
+}
+
+document.addEventListener('click',e=>{
+  const t=e.target;
+  const ab=t.closest('[data-abrir]');if(ab){abrir(+ab.dataset.abrir,ab);return}
+  if(t.closest('[data-cerrar]')){cerrar();return}
+  const f=t.closest('[data-f]');if(f){fb=+f.dataset.f;filtrar();if(fb)$('#bloque-'+fb).scrollIntoView({block:'start'});return}
+  const ir=t.closest('[data-ir]');if(ir){e.preventDefault();$('#'+ir.dataset.ir).scrollIntoView({block:'start'});return}
+  const sec=t.closest('.menu a');if(sec){e.preventDefault();$('#'+sec.dataset.s).scrollIntoView({block:'start'});return}
+  const nv=t.closest('[data-nav]');if(nv){const n=actual+ +nv.dataset.nav;if(n>=1&&n<=20){renderModal(n,'inicio');$('#m-cuerpo').scrollTop=0;$('[data-nav="'+nv.dataset.nav+'"]',$('#sheet'))?.focus()}return}
+  const sg=t.closest('.seg');if(sg){cambiarTab(sg.dataset.k)}
+});
+document.addEventListener('change',e=>{
+  if(e.target.matches('[data-vista]'))marcar(+e.target.dataset.vista,e.target.checked,e.target);
+  if(e.target.id==='m-vista')marcar(actual,e.target.checked,e.target);
+});
+$('#q').addEventListener('input',filtrar);
+document.addEventListener('keydown',e=>{
+  if($('#modal').hidden)return;
+  if(e.key==='Escape'){e.preventDefault();cerrar();return}
+  if(e.key==='Tab'){
+    const f=$$('button,input,[tabindex="0"]',$('#sheet')).filter(x=>!x.disabled&&x.tabIndex>=0);
+    if(!f.length)return;const p=f[0],u=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===p){e.preventDefault();u.focus()}
+    else if(!e.shiftKey&&document.activeElement===u){e.preventDefault();p.focus()}
+  }
+  const seg=e.target.closest&&e.target.closest('.seg');
+  if(seg&&['ArrowRight','ArrowLeft','Home','End'].includes(e.key)){
+    e.preventDefault();const ks=TABS.map(t=>t[0]);let i=ks.indexOf(seg.dataset.k);
+    i=e.key==='ArrowRight'?(i+1)%3:e.key==='ArrowLeft'?(i+2)%3:e.key==='Home'?0:2;
+    cambiarTab(ks[i]);$('#tab-'+ks[i]).focus();
+  }
+});
+$('#ir20').addEventListener('click',e=>abrir(20,e.currentTarget));
+let confirmar=false,tm;
+$('#reiniciar').addEventListener('click',e=>{
+  const b=e.currentTarget;
+  if(!confirmar){confirmar=true;b.textContent='Toca otra vez para borrar';b.classList.add('aviso');tm=setTimeout(()=>{confirmar=false;b.textContent='Borrar vistas';b.classList.remove('aviso')},4000);return}
+  clearTimeout(tm);confirmar=false;b.textContent='Borrar vistas';b.classList.remove('aviso');vistas=new Set();guardar();actualizarProgreso();
+});
+
+const ORDEN=['inicio','objetivo','recorrido','bloque-1','bloque-2','bloque-3','bloque-4','evaluacion','sintesis','cierre'];
+const luzPara=id=>['inicio','objetivo','recorrido'].includes(id)?'r':['bloque-1','bloque-2'].includes(id)?'a':'v';
+function alScroll(){
+  const y=scrollY,h=document.documentElement.scrollHeight-innerHeight;
+  const p=h>0?Math.min(1,Math.max(0,y/h)):0;
+  const car=$('#auto-scroll');car.style.transform=`translateX(${p*(car.parentElement.clientWidth-46)}px)`;
+  const ref=innerHeight*.35;let id=ORDEN[0];
+  for(const s of ORDEN){const el=document.getElementById(s);if(el&&!el.hidden&&el.getBoundingClientRect().top<=ref)id=s}
+  if(h>0&&y>=h-4)id='cierre';
+  $('#semaforo').dataset.luz=luzPara(id);
+  const link=id.startsWith('bloque')?'bloques':id;
+  $$('.menu a').forEach(a=>{if(a.dataset.s===link)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current')});
+}
+let tick=false;
+addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(()=>{tick=false;alScroll()})}},{passive:true});
+addEventListener('resize',alScroll);
+
+function observar(){
+  const todo=$$('.card,.cab,.bloque');
+  if(!('IntersectionObserver' in window)){todo.forEach(c=>c.classList.add('in'));return}
+  const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.15});
+  todo.forEach(c=>io.observe(c));
+  let fiesta=false;
+  new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting&&!fiesta){fiesta=true;confeti(innerWidth/2,innerHeight*.5,30)}}),{threshold:.7}).observe($('.cierre'));
+}
+function renderPrint(){
+  $('#imprimible').innerHTML=`<h1>Movilidad segura para estudiantes universitarios</h1><p>20 actividades · 4 bloques · 20 horas. Producto integrador: Manual de movilidad segura.</p>`+
+  bloques.map(b=>`<h2>Bloque ${b.n}. ${esc(b.titulo)}</h2><p>${esc(b.objetivo)}</p>`+actividades.filter(a=>a.bloque===b.n).map(a=>`
+    <div class="act"><p><b>Actividad ${a.n}. ${esc(a.titulo)}</b> (1 hora)</p><p><b>Objetivo:</b> ${esc(a.objetivo)}</p><p><b>Recursos:</b> ${esc(a.recursos)}</p>
+    <p><b>Inicio (10 min):</b> ${esc(a.inicio)}</p><p><b>Desarrollo (35 min):</b> ${esc(a.desarrollo)}</p><p><b>Cierre (15 min):</b> ${esc(a.cierre)}</p>
+    <p><b>Evaluación formativa, ${esc(a.estrategia)}:</b> ${esc(a.dinamica)} <i>Tipología: ${esc(a.tipologia)}.</i></p><p><b>Evidencia:</b> ${esc(a.evidencia)}</p></div>`).join('')).join('');
+}
+renderMapa();renderBloques();renderTablas();renderPrint();actualizarProgreso();filtrar();observar();alScroll();
+</script>
+
+</body></html>
